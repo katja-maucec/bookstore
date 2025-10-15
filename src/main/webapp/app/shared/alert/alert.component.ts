@@ -15,6 +15,7 @@ export class AlertComponent implements OnInit, OnDestroy {
   private readonly alertService = inject(AlertService);
 
   ngOnInit(): void {
+    console.log('Alerts on init:', this.alertService.get());
     this.alerts.set(this.alertService.get());
   }
 

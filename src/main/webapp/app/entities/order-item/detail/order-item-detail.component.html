@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (orderItem(); as orderItemRef) {
+      <div>
+        <h2 data-cy="orderItemDetailsHeading"><span>Order Item</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ orderItemRef.id }}</span>
+          </dd>
+          <dt><span>Quantity</span></dt>
+          <dd>
+            <span>{{ orderItemRef.quantity }}</span>
+          </dd>
+          <dt><span>Price</span></dt>
+          <dd>
+            <span>{{ orderItemRef.price }}</span>
+          </dd>
+          <dt><span>Book</span></dt>
+          <dd>
+            @if (orderItem()!.book) {
+              <div>
+                <a [routerLink]="['/book', orderItem()!.book?.id, 'view']">{{ orderItemRef.book?.title }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Order</span></dt>
+          <dd>
+            @if (orderItem()!.order) {
+              <div>
+                <a [routerLink]="['/order', orderItem()!.order?.id, 'view']">{{ orderItemRef.order?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/order-item', orderItemRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

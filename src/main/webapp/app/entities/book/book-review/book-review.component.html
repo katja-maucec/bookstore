@@ -1,0 +1,45 @@
+<div class="container mt-4">
+  <h2>Leave a Review for "{{ book?.title }}"</h2>
+
+  <form #reviewForm="ngForm" (ngSubmit)="submitReview()">
+    <!-- Rating -->
+    <div class="mb-3">
+      <label for="rating" class="form-label">Rating:</label>
+      <div class="d-flex align-items-center">
+        <ng-container *ngFor="let star of [1, 2, 3, 4, 5]">
+          <fa-icon
+            [icon]="star <= (hoveredRating ?? review.rating ?? 0) ? faStar : farStar"
+            class="text-warning me-1"
+            style="cursor: pointer"
+            (click)="review.rating = star"
+            (mouseenter)="hoveredRating = star"
+            (mouseleave)="hoveredRating = null"
+            (keydown.enter)="review.rating = star"
+            (keydown.space)="review.rating = star"
+            tabindex="0"
+          ></fa-icon>
+        </ng-container>
+      </div>
+      <div *ngIf="!review.rating && submitted" class="text-danger mt-1">Rating is required.</div>
+    </div>
+
+    <!-- Comment -->
+    <div class="mb-3">
+      <label for="comment" class="form-label">Comment:</label>
+      <textarea
+        id="comment"
+        class="form-control"
+        rows="4"
+        [(ngModel)]="review.comment"
+        name="comment"
+        required
+        #comment="ngModel"
+      ></textarea>
+      <div *ngIf="comment.invalid && submitted" class="text-danger mt-1">Comment is required.</div>
+    </div>
+
+    <!-- Submit -->
+    <button type="submit" class="btn btn-primary me-2">Submit Review</button>
+    <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  </form>
+</div>

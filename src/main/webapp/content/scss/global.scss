@@ -40,6 +40,23 @@ Generic styles
 
 /* other generic styles */
 
+.app-wrapper {
+  /* make sure to wrap your layout in this class */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* full viewport height */
+}
+
+.content {
+  flex: 1; /* takes up all remaining space, pushing footer down */
+}
+
+footer {
+  background: #f8f9fa;
+  padding: 1rem;
+  text-align: center;
+}
+
 .jh-card {
   padding: 1.5%;
   margin-top: 20px;
@@ -191,6 +208,7 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
 ========================================================================== */
 /* page-ribbon.component.scss */
 .ribbon {
+  display: none !important;
   left: -3.5em;
   -moz-transform: rotate(-45deg);
   -ms-transform: rotate(-45deg);

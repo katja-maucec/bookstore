@@ -1,0 +1,180 @@
+<div>
+  <h2 id="page-heading" data-cy="BookHeading">
+    <span>Books</span>
+
+    <div class="d-flex justify-content-end">
+      <button
+        *ngIf="isAdmin()"
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-book"
+        [routerLink]="['/book/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span class="hidden-sm-down">Create a new Book</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <form name="searchForm" class="row row-cols-sm-auto align-items-center">
+    <div class="col-sm-12">
+      <div class="input-group w-100 mt-3">
+        <label class="visually-hidden" for="currentSearch">Search for Book</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="currentSearch"
+          id="currentSearch"
+          name="currentSearch"
+          placeholder="Search for Book"
+        />
+
+        <button class="btn btn-info" (click)="search(currentSearch)">
+          <fa-icon icon="search"></fa-icon>
+        </button>
+
+        @if (currentSearch) {
+          <button class="btn btn-danger" (click)="search('')">
+            <fa-icon icon="trash-alt"></fa-icon>
+          </button>
+        }
+      </div>
+    </div>
+  </form>
+
+  @if (!isLoading && books().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Books found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <!--            <th scope="col" jhiSortBy="id">-->
+            <!--              <div class="d-flex">-->
+            <!--                <span>ID</span>-->
+
+            <!--                <fa-icon class="p-1" icon="sort"></fa-icon>-->
+            <!--              </div>-->
+            <!--            </th>-->
+            <th scope="col" jhiSortBy="title">
+              <div class="d-flex">
+                <span>Title</span>
+                @if (!currentSearch) {
+                  <fa-icon class="p-1" icon="sort"></fa-icon>
+                }
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="author">
+              <div class="d-flex">
+                <span>Author</span>
+                @if (!currentSearch) {
+                  <fa-icon class="p-1" icon="sort"></fa-icon>
+                }
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="description">
+              <div class="d-flex">
+                <span>Description</span>
+                @if (!currentSearch) {
+                  <fa-icon class="p-1" icon="sort"></fa-icon>
+                }
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="price">
+              <div class="d-flex">
+                <span>Price</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="available">
+              <div class="d-flex">
+                <span>Available</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="category.name">
+              <div class="d-flex">
+                <span>Category</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col">
+              <div class="d-flex">
+                <span>Rating</span>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (book of books(); track trackId(book)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/book', book.id, 'view']">{{ book.title }}</a>
+              </td>
+              <!--              <td>{{ book.title }}</td>-->
+              <td>{{ book.author }}</td>
+              <td>{{ book.description }}</td>
+              <td>${{ book.price }}</td>
+              <td>{{ book.available }}</td>
+              <td>
+                @if (book.category) {
+                  <div>{{ book.category.name }}</div>
+                }
+              </td>
+              <td>
+                <ng-container *ngIf="book.averageRating !== null && book.averageRating !== undefined; else noRating">
+                  <span style="min-width: 120px; display: inline-block">
+                    <ng-container *ngFor="let star of getStars(book)">
+                      <fa-icon [icon]="star <= averageRating(book) ? faStar : farStar" class="text-warning"></fa-icon>
+                    </ng-container>
+                  </span>
+                </ng-container>
+                <ng-template #noRating>
+                  <span class="text-muted">–</span>
+                </ng-template>
+              </td>
+
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/book', book.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a *ngIf="isAdmin()" [routerLink]="['/book', book.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button *ngIf="isAdmin()" type="submit" (click)="delete(book)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+
+                  <a
+                    *ngIf="!isAdmin()"
+                    [routerLink]="['/book', book.id, 'review']"
+                    class="btn btn-success btn-sm"
+                    data-cy="entityLeaveReviewButton"
+                  >
+                    <fa-icon icon="star"></fa-icon>
+                    <span class="d-none d-md-inline">Review</span>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

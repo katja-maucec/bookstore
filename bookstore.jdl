@@ -1,0 +1,64 @@
+entity Book {
+  title String required
+  author String required
+  description String
+  price BigDecimal required
+  available Boolean required
+}
+
+entity Category {
+  name String required
+}
+
+entity Review {
+  rating Integer required min(1) max(5)
+  comment String
+  createdAt Instant
+}
+
+entity ShoppingCart {
+  createdAt Instant required
+  completed Boolean required
+}
+
+entity CartItem {
+  quantity Integer required min(1)
+}
+
+entity Order {
+  totalPrice BigDecimal required
+  placedAt Instant required
+  status OrderStatus required
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  CANCELLED
+  COMPLETED
+}
+
+entity OrderItem {
+  quantity Integer required
+  price BigDecimal required
+}
+
+/* Relationships */
+relationship OneToOne {
+  ShoppingCart{user(login)} to User with builtInEntity
+}
+
+relationship OneToMany {
+  Book{review} to Review{book}
+  ShoppingCart{items} to CartItem{cart}
+  Order{items} to OrderItem{order}
+}
+
+relationship ManyToOne {
+  Book{category(name) required} to Category
+  CartItem{book(title)} to Book
+  OrderItem{book(title)} to Book
+  Review{user(login)} to User with builtInEntity
+  Order{user(login)} to User with builtInEntity
+}

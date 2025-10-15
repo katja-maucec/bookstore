@@ -1,0 +1,90 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (book(); as bookRef) {
+      <div>
+        <h2 data-cy="bookDetailsHeading">
+          <span>{{ bookRef.title }}</span>
+        </h2>
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>Author</span></dt>
+          <dd>
+            <span>{{ bookRef.author }}</span>
+          </dd>
+          <dt><span>Description</span></dt>
+          <dd>
+            <span>{{ bookRef.description }}</span>
+          </dd>
+          <dt><span>Price</span></dt>
+          <dd>
+            <span>${{ bookRef.price }}</span>
+          </dd>
+          <dt><span>Available</span></dt>
+          <dd>
+            <span>{{ bookRef.available }}</span>
+          </dd>
+          <dt><span>Category</span></dt>
+          <dd>
+            @if (book()!.category) {
+              <div>{{ bookRef.category?.name }}</div>
+            }
+          </dd>
+        </dl>
+
+        <hr />
+
+        <!-- Reviews Section -->
+        <h3>Reviews</h3>
+        @if (reviews(); as reviewList) {
+          <div *ngIf="reviewList.length === 0">
+            <p>No reviews yet.</p>
+          </div>
+
+          <ul class="list-group">
+            @for (review of reviewList; track review.id) {
+              <li class="list-group-item review-item">
+                <div class="review-left">
+                  <h5>Rated by {{ review.user?.login ?? 'Anonymous' }}</h5>
+                  <div class="stars">
+                    <ng-container *ngFor="let star of [1, 2, 3, 4, 5]">
+                      <fa-icon [icon]="star <= (review.rating ?? 0) ? faStar : farStar" class="text-warning me-1"></fa-icon>
+                    </ng-container>
+                  </div>
+                  <br />
+                  <strong>{{ review.comment ?? 'No comment' }}</strong
+                  ><br />
+                  {{ review.createdAt?.format('YYYY-MM-DD HH:mm') ?? 'Unknown' }}
+                </div>
+
+                <button
+                  *ngIf="isAdmin()"
+                  type="submit"
+                  (click)="delete(review)"
+                  class="btn btn-danger btn-sm delete-button"
+                  data-cy="entityDeleteButton"
+                >
+                  <fa-icon icon="times"></fa-icon>
+                  <span class="d-none d-md-inline">Delete</span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+
+        <hr />
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button *ngIf="isAdmin()" type="button" [routerLink]="['/book', bookRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

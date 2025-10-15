@@ -6,6 +6,7 @@ import {
   faBell,
   faBook,
   faCalendarAlt,
+  faCartShopping,
   faCheck,
   faCloud,
   faCogs,
@@ -18,6 +19,7 @@ import {
   faLock,
   faPencilAlt,
   faPlus,
+  faReceipt,
   faRoad,
   faSave,
   faSearch,
@@ -26,6 +28,7 @@ import {
   faSort,
   faSortDown,
   faSortUp,
+  faStar,
   faSync,
   faTachometerAlt,
   faTasks,
@@ -40,6 +43,8 @@ import {
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
 
+import { faStar as farStar } from '@fortawesome/free-regular-svg-icons';
+
 export const fontAwesomeIcons = [
   faArrowLeft,
   faAsterisk,
@@ -48,6 +53,7 @@ export const fontAwesomeIcons = [
   faBell,
   faBook,
   faCalendarAlt,
+  faCartShopping,
   faCheck,
   faCloud,
   faCogs,
@@ -60,6 +66,7 @@ export const fontAwesomeIcons = [
   faLock,
   faPencilAlt,
   faPlus,
+  faReceipt,
   faRoad,
   faSave,
   faSearch,
@@ -68,6 +75,8 @@ export const fontAwesomeIcons = [
   faSort,
   faSortDown,
   faSortUp,
+  faStar,
+  farStar,
   faSync,
   faTachometerAlt,
   faTasks,

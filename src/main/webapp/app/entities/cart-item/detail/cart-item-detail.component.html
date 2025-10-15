@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (cartItem(); as cartItemRef) {
+      <div>
+        <h2 data-cy="cartItemDetailsHeading"><span>Cart Item</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ cartItemRef.id }}</span>
+          </dd>
+          <dt><span>Quantity</span></dt>
+          <dd>
+            <span>{{ cartItemRef.quantity }}</span>
+          </dd>
+          <dt><span>Book</span></dt>
+          <dd>
+            @if (cartItem()!.book) {
+              <div>
+                <a [routerLink]="['/book', cartItem()!.book?.id, 'view']">{{ cartItemRef.book?.title }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Cart</span></dt>
+          <dd>
+            @if (cartItem()!.cart) {
+              <div>
+                <a [routerLink]="['/shopping-cart', cartItem()!.cart?.id, 'view']">{{ cartItemRef.cart?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/cart-item', cartItemRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

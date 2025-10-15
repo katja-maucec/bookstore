@@ -1,0 +1,28 @@
+.review-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* keeps the delete button vertically centered */
+  padding: 1rem;
+  gap: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.review-left {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* makes it take all the left-side space */
+}
+
+.delete-button {
+  align-self: center; /* ensures the button centers vertically */
+  min-width: 90px; /* optional: keeps width consistent */
+  text-align: center;
+  white-space: nowrap;
+}
+
+.stars {
+  display: flex;
+  flex-direction: row; /* ensures stars are horizontal */
+  align-items: center; /* vertically centers icons if needed */
+  gap: 0.1rem; /* optional: small spacing between stars */
+}

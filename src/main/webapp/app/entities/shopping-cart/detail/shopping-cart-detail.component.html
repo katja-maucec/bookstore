@@ -1,0 +1,42 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (shoppingCart(); as shoppingCartRef) {
+      <div>
+        <h2 data-cy="shoppingCartDetailsHeading"><span>Shopping Cart</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ shoppingCartRef.id }}</span>
+          </dd>
+          <dt><span>Created At</span></dt>
+          <dd>
+            <span>{{ shoppingCartRef.createdAt | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Completed</span></dt>
+          <dd>
+            <span>{{ shoppingCartRef.completed }}</span>
+          </dd>
+          <dt><span>User</span></dt>
+          <dd>
+            <span>{{ shoppingCartRef.user?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/shopping-cart', shoppingCartRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

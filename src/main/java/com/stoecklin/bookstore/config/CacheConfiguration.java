@@ -50,6 +50,18 @@ public class CacheConfiguration {
             createCache(cm, com.stoecklin.bookstore.domain.User.class.getName());
             createCache(cm, com.stoecklin.bookstore.domain.Authority.class.getName());
             createCache(cm, com.stoecklin.bookstore.domain.User.class.getName() + ".authorities");
+            createCache(cm, com.stoecklin.bookstore.domain.Book.class.getName());
+            createCache(cm, com.stoecklin.bookstore.domain.Book.class.getName() + ".reviews");
+            createCache(cm, com.stoecklin.bookstore.domain.Book.class.getName() + ".categories");
+            createCache(cm, com.stoecklin.bookstore.domain.Category.class.getName());
+            createCache(cm, com.stoecklin.bookstore.domain.Category.class.getName() + ".books");
+            createCache(cm, com.stoecklin.bookstore.domain.Review.class.getName());
+            createCache(cm, com.stoecklin.bookstore.domain.ShoppingCart.class.getName());
+            createCache(cm, com.stoecklin.bookstore.domain.ShoppingCart.class.getName() + ".items");
+            createCache(cm, com.stoecklin.bookstore.domain.CartItem.class.getName());
+            createCache(cm, com.stoecklin.bookstore.domain.Order.class.getName());
+            createCache(cm, com.stoecklin.bookstore.domain.Order.class.getName() + ".items");
+            createCache(cm, com.stoecklin.bookstore.domain.OrderItem.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }
