@@ -1,16 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Observable, asapScheduler, map, scheduled } from 'rxjs';
-
-import { catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import dayjs from 'dayjs/esm';
 
 import { isPresent } from 'app/core/util/operators';
 import { ApplicationConfigService } from 'app/core/config/application-config.service';
 import { createRequestOption } from 'app/core/request/request-util';
-import { Search } from 'app/core/request/request.model';
 import { IShoppingCart, NewShoppingCart } from '../shopping-cart.model';
+import { ICartItem } from '../../cart-item/cart-item.model';
 
 export type PartialUpdateShoppingCart = Partial<IShoppingCart> & Pick<IShoppingCart, 'id'>;
 
@@ -33,7 +32,19 @@ export class ShoppingCartService {
   protected readonly applicationConfigService = inject(ApplicationConfigService);
 
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/shopping-carts');
-  protected resourceSearchUrl = this.applicationConfigService.getEndpointFor('api/shopping-carts/_search');
+
+  addBookToCart(bookId: number, quantity: number = 1): Observable<HttpResponse<ICartItem>> {
+    return this.http.post<ICartItem>(`${this.resourceUrl}/add-book`, null, {
+      params: { bookId: bookId.toString(), quantity: quantity.toString() },
+      observe: 'response',
+    });
+  }
+
+  getMyCart(): Observable<EntityResponseType> {
+    return this.http
+      .get<RestShoppingCart>(`${this.resourceUrl}/my-cart`, { observe: 'response' })
+      .pipe(map(res => this.convertResponseFromServer(res)));
+  }
 
   create(shoppingCart: NewShoppingCart): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(shoppingCart);
@@ -71,15 +82,6 @@ export class ShoppingCartService {
 
   delete(id: number): Observable<HttpResponse<{}>> {
     return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
-  }
-
-  search(req: Search): Observable<EntityArrayResponseType> {
-    const options = createRequestOption(req);
-    return this.http.get<RestShoppingCart[]>(this.resourceSearchUrl, { params: options, observe: 'response' }).pipe(
-      map(res => this.convertResponseArrayFromServer(res)),
-
-      catchError(() => scheduled([new HttpResponse<IShoppingCart[]>()], asapScheduler)),
-    );
   }
 
   getShoppingCartIdentifier(shoppingCart: Pick<IShoppingCart, 'id'>): number {

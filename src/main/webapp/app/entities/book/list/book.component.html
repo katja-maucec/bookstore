@@ -169,6 +169,18 @@
                     <fa-icon icon="star"></fa-icon>
                     <span class="d-none d-md-inline">Review</span>
                   </a>
+                  <button
+                    *ngIf="!isAdmin()"
+                    type="button"
+                    (click)="addToCart(book)"
+                    [disabled]="!canAddToCart(book)"
+                    class="btn btn-warning btn-sm"
+                    [class.disabled]="!canAddToCart(book)"
+                    data-cy="entityAddToCartButton"
+                  >
+                    <fa-icon icon="shopping-cart"></fa-icon>
+                    <span class="d-none d-md-inline">Add to Cart</span>
+                  </button>
                 </div>
               </td>
             </tr>

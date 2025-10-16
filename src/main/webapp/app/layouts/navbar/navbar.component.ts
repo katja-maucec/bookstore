@@ -8,6 +8,7 @@ import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { EntityNavbarItems } from 'app/entities/entity-navbar-items';
 import { environment } from 'environments/environment';
 import NavbarItem from './navbar-item.model';
+import { Authority } from 'app/config/authority.constants';
 
 @Component({
   selector: 'jhi-navbar',
@@ -22,6 +23,9 @@ export default class NavbarComponent implements OnInit {
   version = '';
   account = inject(AccountService).trackCurrentAccount();
   entitiesNavbarItems: NavbarItem[] = [];
+  isAdmin(): boolean {
+    return this.account()?.authorities?.includes(Authority.ADMIN) ?? false;
+  }
 
   private readonly loginService = inject(LoginService);
   private readonly profileService = inject(ProfileService);

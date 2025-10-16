@@ -45,7 +45,7 @@
           <!--              </span>-->
           <!--            </a>-->
           <!--          </li>-->
-          <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <li *ngIf="!isAdmin()" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
             <a class="nav-link" routerLink="/shopping-cart" (click)="collapseNavbar()">
               <span>
                 <fa-icon icon="cart-shopping"></fa-icon>

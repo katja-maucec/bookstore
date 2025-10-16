@@ -5,6 +5,7 @@ import com.stoecklin.bookstore.domain.CartItem;
 import com.stoecklin.bookstore.domain.Order;
 import com.stoecklin.bookstore.domain.OrderItem;
 import com.stoecklin.bookstore.domain.ShoppingCart;
+import com.stoecklin.bookstore.domain.User;
 import com.stoecklin.bookstore.domain.enumeration.OrderStatus;
 import com.stoecklin.bookstore.repository.BookRepository;
 import com.stoecklin.bookstore.repository.CartItemRepository;
@@ -46,14 +47,16 @@ public class ShoppingCartService {
 
     public ShoppingCart getOrCreateCurrentUserCart() {
         String login = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new IllegalStateException("User not logged in"));
-        return userRepository
-            .findOneByLogin(login)
-            .flatMap(cartRepository::findOneByUserAndCompletedIsFalse)
+
+        User user = userRepository.findOneByLogin(login).orElseThrow(() -> new IllegalStateException("User not found: " + login));
+
+        return cartRepository
+            .findOneByUserAndCompletedIsFalse(user)
             .orElseGet(() -> {
                 ShoppingCart c = new ShoppingCart();
                 c.setCreatedAt(Instant.now());
-                // attach user
-                userRepository.findOneByLogin(login).ifPresent(c::setUser);
+                c.setCompleted(false);
+                c.setUser(user);
                 return cartRepository.save(c);
             });
     }

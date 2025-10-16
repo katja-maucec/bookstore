@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
-import { ASC } from 'app/config/navigation.constants';
 import ShoppingCartResolve from './route/shopping-cart-routing-resolve.service';
 
 const shoppingCartRoute: Routes = [
@@ -9,7 +8,7 @@ const shoppingCartRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/shopping-cart.component').then(m => m.ShoppingCartComponent),
     data: {
-      defaultSort: `id,${ASC}`,
+      pageTitle: 'My Shopping Cart',
     },
     canActivate: [UserRouteAccessService],
   },

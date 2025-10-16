@@ -17,6 +17,7 @@ import { AccountService } from 'app/core/auth/account.service';
 import { Authority } from 'app/config/authority.constants';
 import { IReview } from '../../review/review.model';
 import { RefreshService } from '../../../shared/refresh.service';
+import { ShoppingCartService } from '../../shopping-cart/service/shopping-cart.service';
 
 type BookWithAverage = IBook & {
   reviews: IReview[]; // always an array
@@ -52,6 +53,7 @@ export class BookComponent implements OnInit {
   protected ngZone = inject(NgZone);
   protected accountService = inject(AccountService);
   protected refreshService = inject(RefreshService);
+  protected shoppingCartService = inject(ShoppingCartService);
 
   trackId = (book: Pick<IBook, 'id'>): number => this.bookService.getBookIdentifier(book);
 
@@ -110,6 +112,26 @@ export class BookComponent implements OnInit {
 
   getStars(book: any): number[] {
     return [1, 2, 3, 4, 5];
+  }
+
+  addToCart(book: IBook): void {
+    if (!book.id || (book.stock ?? 0) <= 0) {
+      return;
+    }
+
+    this.shoppingCartService.addBookToCart(book.id, 1).subscribe({
+      next: () => {
+        alert(`Added "${book.title}" to your cart!`);
+      },
+      error: err => {
+        console.error('Error adding to cart:', err);
+        alert('Failed to add book to cart. Please try again.');
+      },
+    });
+  }
+
+  canAddToCart(book: IBook): boolean {
+    return !this.isAdmin() && (book.stock ?? 0) > 0;
   }
 
   navigateToWithComponentValues(event: SortState): void {

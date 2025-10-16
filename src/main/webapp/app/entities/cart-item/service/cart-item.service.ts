@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable, asapScheduler, scheduled } from 'rxjs';
-
 import { catchError } from 'rxjs/operators';
 
 import { isPresent } from 'app/core/util/operators';

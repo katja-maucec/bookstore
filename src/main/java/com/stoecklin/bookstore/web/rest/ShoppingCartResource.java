@@ -1,8 +1,12 @@
 package com.stoecklin.bookstore.web.rest;
 
+import com.stoecklin.bookstore.domain.CartItem;
 import com.stoecklin.bookstore.domain.ShoppingCart;
 import com.stoecklin.bookstore.repository.ShoppingCartRepository;
+import com.stoecklin.bookstore.repository.UserRepository;
 import com.stoecklin.bookstore.repository.search.ShoppingCartSearchRepository;
+import com.stoecklin.bookstore.security.SecurityUtils;
+import com.stoecklin.bookstore.service.ShoppingCartService;
 import com.stoecklin.bookstore.web.rest.errors.BadRequestAlertException;
 import com.stoecklin.bookstore.web.rest.errors.ElasticsearchExceptionMapper;
 import jakarta.validation.Valid;
@@ -18,7 +22,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
@@ -41,16 +54,28 @@ public class ShoppingCartResource {
 
     private final ShoppingCartSearchRepository shoppingCartSearchRepository;
 
-    public ShoppingCartResource(ShoppingCartRepository shoppingCartRepository, ShoppingCartSearchRepository shoppingCartSearchRepository) {
+    private final ShoppingCartService shoppingCartService;
+
+    private final UserRepository userRepository;
+
+    public ShoppingCartResource(
+        ShoppingCartRepository shoppingCartRepository,
+        ShoppingCartSearchRepository shoppingCartSearchRepository,
+        ShoppingCartService shoppingCartService,
+        UserRepository userRepository
+    ) {
         this.shoppingCartRepository = shoppingCartRepository;
         this.shoppingCartSearchRepository = shoppingCartSearchRepository;
+        this.shoppingCartService = shoppingCartService;
+        this.userRepository = userRepository;
     }
 
     /**
      * {@code POST  /shopping-carts} : Create a new shoppingCart.
      *
      * @param shoppingCart the shoppingCart to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new shoppingCart, or with status {@code 400 (Bad Request)} if the shoppingCart has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new shoppingCart, or with
+     *     status {@code 400 (Bad Request)} if the shoppingCart has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
@@ -67,13 +92,46 @@ public class ShoppingCartResource {
     }
 
     /**
-     * {@code PUT  /shopping-carts/:id} : Updates an existing shoppingCart.
+     * {@code POST  /shopping-carts/add-book} : Add a book to the current user's cart.
+     *
+     * @param bookId the ID of the book to add
+     * @param quantity the quantity to add (default 1)
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the cart item
+     */
+    @PostMapping("/add-book")
+    public ResponseEntity<CartItem> addBookToCart(@RequestParam Long bookId, @RequestParam(defaultValue = "1") Integer quantity) {
+        LOG.debug("REST request to add book {} to cart", bookId);
+        CartItem cartItem = shoppingCartService.addItem(shoppingCartService.getOrCreateCurrentUserCart().getId(), bookId, quantity);
+        return ResponseEntity.ok().body(cartItem);
+    }
+
+    /**
+     * {@code GET  /shopping-carts/my-cart} : Get the current user's active cart.
+     *
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the shopping cart
+     */
+    @GetMapping("/my-cart")
+    public ResponseEntity<ShoppingCart> getMyCart() {
+        LOG.debug("REST request to get current user's cart");
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new IllegalStateException("User not logged in"));
+
+        Optional<ShoppingCart> cart = userRepository
+            .findOneByLogin(login)
+            .flatMap(user -> shoppingCartRepository.findByUserAndCompletedWithItems(user.getId(), false));
+
+        return ResponseUtil.wrapOrNotFound(cart);
+    }
+
+    /**
+     * {@code SEARCH  /shopping-carts/_search?query=:query} : search for the shoppingCart corresponding to the query.
+     *
+     * /** {@code PUT  /shopping-carts/:id} : Updates an existing shoppingCart.
      *
      * @param id the id of the shoppingCart to save.
      * @param shoppingCart the shoppingCart to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated shoppingCart,
-     * or with status {@code 400 (Bad Request)} if the shoppingCart is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the shoppingCart couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated shoppingCart, or with
+     *     status {@code 400 (Bad Request)} if the shoppingCart is not valid, or with status
+     *     {@code 500 (Internal Server Error)} if the shoppingCart couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
@@ -101,14 +159,15 @@ public class ShoppingCartResource {
     }
 
     /**
-     * {@code PATCH  /shopping-carts/:id} : Partial updates given fields of an existing shoppingCart, field will ignore if it is null
+     * {@code PATCH  /shopping-carts/:id} : Partial updates given fields of an existing shoppingCart, field will ignore
+     * if it is null
      *
      * @param id the id of the shoppingCart to save.
      * @param shoppingCart the shoppingCart to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated shoppingCart,
-     * or with status {@code 400 (Bad Request)} if the shoppingCart is not valid,
-     * or with status {@code 404 (Not Found)} if the shoppingCart is not found,
-     * or with status {@code 500 (Internal Server Error)} if the shoppingCart couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated shoppingCart, or with
+     *     status {@code 400 (Bad Request)} if the shoppingCart is not valid, or with status {@code 404 (Not Found)} if
+     *     the shoppingCart is not found, or with status {@code 500 (Internal Server Error)} if the shoppingCart
+     *     couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
@@ -174,7 +233,8 @@ public class ShoppingCartResource {
      * {@code GET  /shopping-carts/:id} : get the "id" shoppingCart.
      *
      * @param id the id of the shoppingCart to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the shoppingCart, or with status {@code 404 (Not Found)}.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the shoppingCart, or with status
+     *     {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
     public ResponseEntity<ShoppingCart> getShoppingCart(@PathVariable("id") Long id) {
@@ -200,8 +260,7 @@ public class ShoppingCartResource {
     }
 
     /**
-     * {@code SEARCH  /shopping-carts/_search?query=:query} : search for the shoppingCart corresponding
-     * to the query.
+     * {@code SEARCH  /shopping-carts/_search?query=:query} : search for the shoppingCart corresponding to the query.
      *
      * @param query the query of the shoppingCart search.
      * @return the result of the search.

@@ -1,122 +1,82 @@
-<div>
-  <h2 id="page-heading" data-cy="ShoppingCartHeading">
-    <span>Shopping Carts</span>
-
-    <div class="d-flex justify-content-end">
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-shopping-cart"
-        [routerLink]="['/shopping-cart/new']"
-      >
-        <fa-icon icon="plus"></fa-icon>
-        <span class="hidden-sm-down">Create a new Shopping Cart</span>
-      </button>
-    </div>
-  </h2>
-
-  <jhi-alert-error />
-
-  <jhi-alert />
-
-  <form name="searchForm" class="row row-cols-sm-auto align-items-center">
-    <div class="col-sm-12">
-      <div class="input-group w-100 mt-3">
-        <label class="visually-hidden" for="currentSearch">Search for Shopping Cart</label>
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="currentSearch"
-          id="currentSearch"
-          name="currentSearch"
-          placeholder="Search for Shopping Cart"
-        />
-
-        <button class="btn btn-info" (click)="search(currentSearch)">
-          <fa-icon icon="search"></fa-icon>
-        </button>
-
-        @if (currentSearch) {
-          <button class="btn btn-danger" (click)="search('')">
-            <fa-icon icon="trash-alt"></fa-icon>
-          </button>
-        }
-      </div>
-    </div>
-  </form>
-
-  @if (!isLoading && shoppingCarts().length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span>No Shopping Carts found</span>
+<div class="container mt-4">
+  @if (isAdmin()) {
+    <div class="alert alert-info">
+      <fa-icon icon="info-circle"></fa-icon>
+      <span class="ms-2">Shopping cart functionality is not available for administrators.</span>
     </div>
   } @else {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
-          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span>ID</span>
+    <h2>My Shopping Cart</h2>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="createdAt">
-              <div class="d-flex">
-                <span>Created At</span>
+    @if (isLoading) {
+      <div class="text-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    } @else {
+      @if (cart(); as currentCart) {
+        @if (!currentCart.items || currentCart.items.length === 0) {
+          <div class="alert alert-info">
+            <p class="mb-3">Your cart is empty</p>
+            <button class="btn btn-primary" (click)="continueShopping()">
+              <fa-icon icon="book"></fa-icon>
+              <span class="ms-2">Continue Shopping</span>
+            </button>
+          </div>
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Book</th>
+                  <th>Author</th>
+                  <th class="text-end">Price</th>
+                  <th class="text-center">Quantity</th>
+                  <th class="text-end">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of currentCart.items; track item.id) {
+                  <tr>
+                    <td>
+                      <a [routerLink]="['/book', item.book?.id, 'view']">{{ item.book?.title }}</a>
+                    </td>
+                    <td>{{ item.book?.author }}</td>
+                    <td class="text-end">${{ item.book?.price | number: '1.2-2' }}</td>
+                    <td class="text-center">{{ item.quantity }}</td>
+                    <td class="text-end">${{ (item.book?.price ?? 0) * (item.quantity ?? 0) | number: '1.2-2' }}</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr class="table-active">
+                  <th colspan="4" class="text-end">Total:</th>
+                  <th class="text-end">${{ getTotalPrice() | number: '1.2-2' }}</th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="completed">
-              <div class="d-flex">
-                <span>Completed</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="user.login">
-              <div class="d-flex">
-                <span>User</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (shoppingCart of shoppingCarts(); track trackId(shoppingCart)) {
-            <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/shopping-cart', shoppingCart.id, 'view']">{{ shoppingCart.id }}</a>
-              </td>
-              <td>{{ shoppingCart.createdAt | formatMediumDatetime }}</td>
-              <td>{{ shoppingCart.completed }}</td>
-              <td>
-                {{ shoppingCart.user?.login }}
-              </td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/shopping-cart', shoppingCart.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline">View</span>
-                  </a>
-
-                  <a [routerLink]="['/shopping-cart', shoppingCart.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline">Edit</span>
-                  </a>
-
-                  <button type="submit" (click)="delete(shoppingCart)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+          <div class="d-flex justify-content-between mt-4">
+            <button class="btn btn-secondary" (click)="continueShopping()">
+              <fa-icon icon="arrow-left"></fa-icon>
+              <span class="ms-2">Continue Shopping</span>
+            </button>
+            <button class="btn btn-success btn-lg">
+              <fa-icon icon="credit-card"></fa-icon>
+              <span class="ms-2">Proceed to Checkout</span>
+            </button>
+          </div>
+        }
+      } @else {
+        <div class="alert alert-warning">
+          <p>Unable to load your cart. Please try again.</p>
+          <button class="btn btn-primary" (click)="loadCart()">
+            <fa-icon icon="sync"></fa-icon>
+            <span class="ms-2">Retry</span>
+          </button>
+        </div>
+      }
+    }
   }
 </div>

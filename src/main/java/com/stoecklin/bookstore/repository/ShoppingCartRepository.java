@@ -41,4 +41,12 @@ public interface ShoppingCartRepository extends JpaRepository<ShoppingCart, Long
     Optional<ShoppingCart> findOneWithToOneRelationships(@Param("id") Long id);
 
     Optional<ShoppingCart> findOneByUserAndCompletedIsFalse(User user);
+
+    Optional<ShoppingCart> findByUserAndCompleted(User user, Boolean completed);
+
+    @Query(
+        "SELECT sc FROM ShoppingCart sc LEFT JOIN FETCH sc.items items LEFT JOIN FETCH items.book WHERE sc.user.id = " +
+        ":userId AND sc.completed = :completed"
+    )
+    Optional<ShoppingCart> findByUserAndCompletedWithItems(@Param("userId") Long userId, @Param("completed") Boolean completed);
 }

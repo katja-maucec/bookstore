@@ -1,8 +1,18 @@
 package com.stoecklin.bookstore.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
@@ -44,7 +54,7 @@ public class ShoppingCart implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "cart")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @org.springframework.data.annotation.Transient
-    @JsonIgnoreProperties(value = { "book", "cart" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "cart" }, allowSetters = true)
     private Set<CartItem> items = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -155,9 +165,9 @@ public class ShoppingCart implements Serializable {
     @Override
     public String toString() {
         return "ShoppingCart{" +
-            "id=" + getId() +
-            ", createdAt='" + getCreatedAt() + "'" +
-            ", completed='" + getCompleted() + "'" +
-            "}";
+               "id=" + getId() +
+               ", createdAt='" + getCreatedAt() + "'" +
+               ", completed='" + getCompleted() + "'" +
+               "}";
     }
 }
