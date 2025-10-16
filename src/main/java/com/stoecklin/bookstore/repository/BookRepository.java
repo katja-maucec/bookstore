@@ -38,6 +38,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findAllWithToOneRelationships();
 
     // ✅ Book details — fetch category AND reviews
-    @Query("select book from Book book left join fetch book.category where book.id =:id")
+    @Query("select book from Book book left join fetch book.category left join fetch book.reviews where book.id =:id")
     Optional<Book> findOneWithToOneRelationships(@Param("id") Long id);
 }

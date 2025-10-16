@@ -16,6 +16,7 @@ import { BookDeleteDialogComponent } from '../delete/book-delete-dialog.componen
 import { AccountService } from 'app/core/auth/account.service';
 import { Authority } from 'app/config/authority.constants';
 import { IReview } from '../../review/review.model';
+import { RefreshService } from '../../../shared/refresh.service';
 
 type BookWithAverage = IBook & {
   reviews: IReview[]; // always an array
@@ -50,6 +51,7 @@ export class BookComponent implements OnInit {
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
   protected accountService = inject(AccountService);
+  protected refreshService = inject(RefreshService);
 
   trackId = (book: Pick<IBook, 'id'>): number => this.bookService.getBookIdentifier(book);
 
@@ -63,6 +65,9 @@ export class BookComponent implements OnInit {
         tap(() => this.load()),
       )
       .subscribe();
+    this.refreshService.onRefresh().subscribe(() => {
+      this.load();
+    });
   }
 
   search(query: string): void {

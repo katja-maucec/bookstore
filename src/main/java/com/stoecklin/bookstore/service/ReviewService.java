@@ -42,7 +42,12 @@ public class ReviewService {
 
         // recalculate average rating for the associated book
         if (review.getBook() != null && review.getBook().getId() != null) {
-            updateBookAverageRating(review.getBook().getId());
+            Book book = bookRepository.findById(review.getBook().getId()).orElse(null);
+            if (book != null) {
+                review.setBook(book); // ensures the book reference is managed
+                reviewRepository.save(review);
+                updateBookAverageRating(book.getId());
+            }
         }
 
         return result;

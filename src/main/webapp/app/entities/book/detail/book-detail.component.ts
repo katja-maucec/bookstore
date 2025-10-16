@@ -1,4 +1,4 @@
-import { Component, inject, input, signal, effect } from '@angular/core';
+import { Component, inject, input, signal, effect, WritableSignal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 import SharedModule from 'app/shared/shared.module';
@@ -16,6 +16,8 @@ import { filter, Observable, tap } from 'rxjs';
 import { ITEM_DELETED_EVENT } from '../../../config/navigation.constants';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SortService, sortStateSignal } from '../../../shared/sort';
+import { BookService } from '../service/book.service';
+import { RefreshService } from '../../../shared/refresh.service';
 
 @Component({
   selector: 'jhi-book-detail',
@@ -30,6 +32,7 @@ export class BookDetailComponent {
   isLoading = false;
   sortState = sortStateSignal({});
   currentSearch = '';
+  displayBook = signal<IBook | null>(null);
 
   faStar = faStar;
   farStar = farStar;
@@ -39,15 +42,17 @@ export class BookDetailComponent {
   protected router = inject(Router);
   protected modalService = inject(NgbModal);
   protected readonly sortService = inject(SortService);
+  protected bookService = inject(BookService);
+  protected refreshService = inject(RefreshService);
 
   constructor() {
     // React to book changes
     effect(() => {
       const bookRef = this.book();
       if (bookRef?.id) {
-        this.loadReviews(bookRef.id);
+        this.displayBook.set({ ...bookRef });
       } else {
-        this.reviews.set([]);
+        this.displayBook.set(null);
       }
     });
   }
@@ -82,7 +87,15 @@ export class BookDetailComponent {
         tap(() => {
           const bookId = this.book()?.id;
           if (bookId) {
-            this.loadReviews(bookId); // reload only reviews for this book
+            // reload reviews
+            this.loadReviews(bookId);
+
+            // fetch updated book data
+            this.bookService.find(bookId).subscribe(res => {
+              if (res.body) {
+                this.displayBook.set(res.body);
+              }
+            });
           }
         }),
       )

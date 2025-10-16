@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
-    @if (book(); as bookRef) {
+    @if (displayBook(); as bookRef) {
       <div>
         <h2 data-cy="bookDetailsHeading">
           <span>{{ bookRef.title }}</span>
@@ -29,9 +29,13 @@
           </dd>
           <dt><span>Category</span></dt>
           <dd>
-            @if (book()!.category) {
-              <div>{{ bookRef.category?.name }}</div>
+            @if (bookRef.category) {
+              <div>{{ bookRef.category.name }}</div>
             }
+          </dd>
+          <dt><span>Average Rating</span></dt>
+          <dd>
+            <span>{{ bookRef.averageRating }}</span>
           </dd>
         </dl>
 
