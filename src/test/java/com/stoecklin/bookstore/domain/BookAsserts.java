@@ -52,7 +52,7 @@ public class BookAsserts {
             .satisfies(a -> assertThat(a.getAuthor()).as("check author").isEqualTo(expected.getAuthor()))
             .satisfies(a -> assertThat(a.getDescription()).as("check description").isEqualTo(expected.getDescription()))
             .satisfies(a -> assertThat(a.getPrice()).as("check price").usingComparator(bigDecimalCompareTo).isEqualTo(expected.getPrice()))
-            .satisfies(a -> assertThat(a.getAvailable()).as("check available").isEqualTo(expected.getAvailable()));
+            .satisfies(a -> assertThat(a.getStock()).as("check available").isEqualTo(expected.getStock()));
     }
 
     /**

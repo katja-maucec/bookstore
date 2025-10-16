@@ -1,14 +1,25 @@
 package com.stoecklin.bookstore.web.rest;
 
-import static com.stoecklin.bookstore.domain.BookAsserts.*;
+import static com.stoecklin.bookstore.domain.BookAsserts.assertBookAllPropertiesEquals;
+import static com.stoecklin.bookstore.domain.BookAsserts.assertBookAllUpdatablePropertiesEquals;
+import static com.stoecklin.bookstore.domain.BookAsserts.assertBookUpdatableFieldsEquals;
 import static com.stoecklin.bookstore.web.rest.TestUtil.createUpdateProxyForBean;
 import static com.stoecklin.bookstore.web.rest.TestUtil.sameNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.hasItem;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stoecklin.bookstore.IntegrationTest;
@@ -61,8 +72,8 @@ class BookResourceIT {
     private static final BigDecimal DEFAULT_PRICE = new BigDecimal(1);
     private static final BigDecimal UPDATED_PRICE = new BigDecimal(2);
 
-    private static final Boolean DEFAULT_AVAILABLE = false;
-    private static final Boolean UPDATED_AVAILABLE = true;
+    private static final Integer DEFAULT_STOCK = 10;
+    private static final Integer UPDATED_STOCK = 20;
 
     private static final String ENTITY_API_URL = "/api/books";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -96,8 +107,8 @@ class BookResourceIT {
     /**
      * Create an entity for this test.
      *
-     * This is a static method, as tests for other entities might also need it,
-     * if they test an entity which requires the current entity.
+     * This is a static method, as tests for other entities might also need it, if they test an entity which requires
+     * the current entity.
      */
     public static Book createEntity(EntityManager em) {
         Book book = new Book()
@@ -105,7 +116,7 @@ class BookResourceIT {
             .author(DEFAULT_AUTHOR)
             .description(DEFAULT_DESCRIPTION)
             .price(DEFAULT_PRICE)
-            .available(DEFAULT_AVAILABLE);
+            .stock(DEFAULT_STOCK);
         // Add required entity
         Category category;
         if (TestUtil.findAll(em, Category.class).isEmpty()) {
@@ -122,8 +133,8 @@ class BookResourceIT {
     /**
      * Create an updated entity for this test.
      *
-     * This is a static method, as tests for other entities might also need it,
-     * if they test an entity which requires the current entity.
+     * This is a static method, as tests for other entities might also need it, if they test an entity which requires
+     * the current entity.
      */
     public static Book createUpdatedEntity(EntityManager em) {
         Book updatedBook = new Book()
@@ -131,7 +142,7 @@ class BookResourceIT {
             .author(UPDATED_AUTHOR)
             .description(UPDATED_DESCRIPTION)
             .price(UPDATED_PRICE)
-            .available(UPDATED_AVAILABLE);
+            .stock(UPDATED_STOCK);
         // Add required entity
         Category category;
         if (TestUtil.findAll(em, Category.class).isEmpty()) {
@@ -271,11 +282,11 @@ class BookResourceIT {
 
     @Test
     @Transactional
-    void checkAvailableIsRequired() throws Exception {
+    void checkStockIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(bookSearchRepository.findAll());
         // set the field null
-        book.setAvailable(null);
+        book.setStock(null);
 
         // Create the Book, which fails.
 
@@ -305,7 +316,7 @@ class BookResourceIT {
             .andExpect(jsonPath("$.[*].author").value(hasItem(DEFAULT_AUTHOR)))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
             .andExpect(jsonPath("$.[*].price").value(hasItem(sameNumber(DEFAULT_PRICE))))
-            .andExpect(jsonPath("$.[*].available").value(hasItem(DEFAULT_AVAILABLE)));
+            .andExpect(jsonPath("$.[*].available").value(hasItem(DEFAULT_STOCK)));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -341,7 +352,7 @@ class BookResourceIT {
             .andExpect(jsonPath("$.author").value(DEFAULT_AUTHOR))
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
             .andExpect(jsonPath("$.price").value(sameNumber(DEFAULT_PRICE)))
-            .andExpect(jsonPath("$.available").value(DEFAULT_AVAILABLE));
+            .andExpect(jsonPath("$.available").value(DEFAULT_STOCK));
     }
 
     @Test
@@ -365,12 +376,7 @@ class BookResourceIT {
         Book updatedBook = bookRepository.findById(book.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedBook are not directly saved in db
         em.detach(updatedBook);
-        updatedBook
-            .title(UPDATED_TITLE)
-            .author(UPDATED_AUTHOR)
-            .description(UPDATED_DESCRIPTION)
-            .price(UPDATED_PRICE)
-            .available(UPDATED_AVAILABLE);
+        updatedBook.title(UPDATED_TITLE).author(UPDATED_AUTHOR).description(UPDATED_DESCRIPTION).price(UPDATED_PRICE).stock(UPDATED_STOCK);
 
         restBookMockMvc
             .perform(
@@ -499,7 +505,7 @@ class BookResourceIT {
             .author(UPDATED_AUTHOR)
             .description(UPDATED_DESCRIPTION)
             .price(UPDATED_PRICE)
-            .available(UPDATED_AVAILABLE);
+            .stock(UPDATED_STOCK);
 
         restBookMockMvc
             .perform(
@@ -613,7 +619,7 @@ class BookResourceIT {
             .andExpect(jsonPath("$.[*].author").value(hasItem(DEFAULT_AUTHOR)))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
             .andExpect(jsonPath("$.[*].price").value(hasItem(sameNumber(DEFAULT_PRICE))))
-            .andExpect(jsonPath("$.[*].available").value(hasItem(DEFAULT_AVAILABLE)));
+            .andExpect(jsonPath("$.[*].available").value(hasItem(DEFAULT_STOCK)));
     }
 
     protected long getRepositoryCount() {

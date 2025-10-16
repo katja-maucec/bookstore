@@ -93,9 +93,9 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="available">
+            <th scope="col" jhiSortBy="stock">
               <div class="d-flex">
-                <span>Available</span>
+                <span>Stock</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
@@ -124,7 +124,7 @@
               <td>{{ book.author }}</td>
               <td>{{ book.description }}</td>
               <td>${{ book.price }}</td>
-              <td>{{ book.available }}</td>
+              <td>{{ book.stock }}</td>
               <td>
                 @if (book.category) {
                   <div>{{ book.category.name }}</div>

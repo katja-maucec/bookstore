@@ -55,7 +55,7 @@
         <div class="mb-3">
           <label class="form-label" for="field_price">Price</label>
           <input type="number" class="form-control" name="price" id="field_price" data-cy="price" formControlName="price" />
-          @if (priceRef.invalid && (priceRef.dirty || priceRef.touched)) {
+          @if (editForm.get('price')!.invalid && (editForm.get('price')!.dirty || editForm.get('price')!.touched)) {
             <div>
               @if (editForm.get('price')?.errors?.required) {
                 <small class="form-text text-danger">This field is required.</small>
@@ -65,15 +65,18 @@
           }
         </div>
 
-        @let availableRef = editForm.get('available')!;
         <div class="mb-3">
-          <label class="form-label" for="field_available">Available</label>
-          <input type="checkbox" class="form-check" name="available" id="field_available" data-cy="available" formControlName="available" />
-          @if (availableRef.invalid && (availableRef.dirty || availableRef.touched)) {
+          <label class="form-label" for="field_stock">Stock</label>
+          <input type="number" class="form-control" name="stock" id="field_stock" data-cy="stock" formControlName="stock" min="0" />
+          @if (editForm.get('stock')!.invalid && (editForm.get('stock')!.dirty || editForm.get('stock')!.touched)) {
             <div>
-              @if (editForm.get('available')?.errors?.required) {
+              @if (editForm.get('stock')?.errors?.required) {
                 <small class="form-text text-danger">This field is required.</small>
               }
+              @if (editForm.get('stock')?.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('stock')?.errors?.number">This field should be a number.</small>
             </div>
           }
         </div>

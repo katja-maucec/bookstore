@@ -7,7 +7,7 @@ export interface IBook {
   author?: string | null;
   description?: string | null;
   price?: number | null;
-  available?: boolean | null;
+  stock?: number | null;
   category?: ICategory | null;
   reviews?: IReview[];
   averageRating?: number;

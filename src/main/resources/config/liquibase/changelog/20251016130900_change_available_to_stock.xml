@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="change-available-to-stock" author="system">
+    <!-- Add new stock column -->
+    <addColumn tableName="book">
+      <column name="stock" type="integer">
+        <constraints nullable="true"/>
+      </column>
+    </addColumn>
+
+    <!-- Migrate data: true -> 10, false -> 0 -->
+    <sql>
+      UPDATE book SET stock = CASE WHEN available = true THEN 10 ELSE 0 END;
+    </sql>
+
+    <!-- Make stock not nullable -->
+    <addNotNullConstraint tableName="book" columnName="stock" columnDataType="integer"/>
+
+    <!-- Drop old available column -->
+    <dropColumn tableName="book" columnName="available"/>
+  </changeSet>
+
+</databaseChangeLog>

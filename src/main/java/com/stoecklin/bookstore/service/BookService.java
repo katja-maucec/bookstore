@@ -63,8 +63,8 @@ public class BookService {
                 if (book.getPrice() != null) {
                     existingBook.setPrice(book.getPrice());
                 }
-                if (book.getAvailable() != null) {
-                    existingBook.setAvailable(book.getAvailable());
+                if (book.getStock() != null) {
+                    existingBook.setStock(book.getStock());
                 }
                 // add other fields if your entity has more
                 return existingBook;

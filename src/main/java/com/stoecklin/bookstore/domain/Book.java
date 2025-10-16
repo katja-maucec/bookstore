@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -57,9 +58,10 @@ public class Book implements Serializable {
     private BigDecimal price;
 
     @NotNull
-    @Column(name = "available", nullable = false)
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
-    private Boolean available;
+    @Min(value = 0)
+    @Column(name = "stock", nullable = false)
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Integer)
+    private Integer stock;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -141,17 +143,17 @@ public class Book implements Serializable {
         this.price = price;
     }
 
-    public Boolean getAvailable() {
-        return this.available;
+    public Integer getStock() {
+        return this.stock;
     }
 
-    public Book available(Boolean available) {
-        this.setAvailable(available);
+    public Book stock(Integer stock) {
+        this.setStock(stock);
         return this;
     }
 
-    public void setAvailable(Boolean available) {
-        this.available = available;
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 
     public Set<Review> getReviews() {
@@ -239,7 +241,7 @@ public class Book implements Serializable {
                ", author='" + getAuthor() + "'" +
                ", description='" + getDescription() + "'" +
                ", price=" + getPrice() +
-               ", available='" + getAvailable() + "'" +
+               ", stock=" + getStock() +
                "}";
     }
 }

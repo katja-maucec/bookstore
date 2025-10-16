@@ -14,7 +14,7 @@ type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>
  */
 type BookFormGroupInput = IBook | PartialWithRequiredKeyOf<NewBook>;
 
-type BookFormDefaults = Pick<NewBook, 'id' | 'available'>;
+type BookFormDefaults = Pick<NewBook, 'id'>;
 
 type BookFormGroupContent = {
   id: FormControl<IBook['id'] | NewBook['id']>;
@@ -22,7 +22,7 @@ type BookFormGroupContent = {
   author: FormControl<IBook['author']>;
   description: FormControl<IBook['description']>;
   price: FormControl<IBook['price']>;
-  available: FormControl<IBook['available']>;
+  stock: FormControl<IBook['stock']>;
   category: FormControl<IBook['category']>;
 };
 
@@ -53,8 +53,8 @@ export class BookFormService {
       price: new FormControl(bookRawValue.price, {
         validators: [Validators.required],
       }),
-      available: new FormControl(bookRawValue.available, {
-        validators: [Validators.required],
+      stock: new FormControl(bookRawValue.stock, {
+        validators: [Validators.required, Validators.min(0)],
       }),
       category: new FormControl(bookRawValue.category, {
         validators: [Validators.required],
@@ -79,7 +79,6 @@ export class BookFormService {
   private getFormDefaults(): BookFormDefaults {
     return {
       id: null,
-      available: false,
     };
   }
 }

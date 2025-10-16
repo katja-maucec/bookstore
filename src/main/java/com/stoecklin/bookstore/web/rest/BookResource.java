@@ -154,8 +154,8 @@ public class BookResource {
                 if (book.getPrice() != null) {
                     existingBook.setPrice(book.getPrice());
                 }
-                if (book.getAvailable() != null) {
-                    existingBook.setAvailable(book.getAvailable());
+                if (book.getStock() != null) {
+                    existingBook.setStock(book.getStock());
                 }
 
                 return existingBook;

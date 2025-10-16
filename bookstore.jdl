@@ -3,7 +3,7 @@ entity Book {
   author String required
   description String
   price BigDecimal required
-  available Boolean required
+  stock Integer required min(0)
 }
 
 entity Category {
