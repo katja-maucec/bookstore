@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -9,6 +9,7 @@ import { IBook } from 'app/entities/book/book.model';
 import { Review, NewReview } from 'app/entities/review/review.model';
 import { ReviewService } from 'app/entities/review/service/review.service';
 import { BookService } from 'app/entities/book/service/book.service';
+import { RefreshService } from 'app/shared/refresh.service';
 
 @Component({
   selector: 'app-book-review',
@@ -26,12 +27,11 @@ export class BookReviewComponent implements OnInit {
 
   hoveredRating: number | null = null;
 
-  constructor(
-    private reviewService: ReviewService,
-    private bookService: BookService,
-    private router: Router,
-    private route: ActivatedRoute,
-  ) {}
+  private reviewService = inject(ReviewService);
+  private bookService = inject(BookService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private refreshService = inject(RefreshService);
 
   ngOnInit(): void {
     const bookId = this.route.snapshot.paramMap.get('id');
@@ -63,6 +63,8 @@ export class BookReviewComponent implements OnInit {
       this.reviewService.create(newReview).subscribe({
         next: () => {
           alert('Review submitted successfully!');
+          // Trigger refresh so the book detail page reloads data
+          this.refreshService.notifyRefresh();
           this.router.navigate(['/book', this.book!.id, 'view'], { replaceUrl: true });
         },
         error: err => {

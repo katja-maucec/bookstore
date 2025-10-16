@@ -64,6 +64,25 @@ export class BookDetailComponent {
     this.accountService.identity().subscribe(account => {
       this.isAdmin.set(account?.authorities.includes(Authority.ADMIN) ?? false);
     });
+
+    // Listen for refresh events to reload book data
+    this.refreshService.onRefresh().subscribe(() => {
+      const bookId = this.book()?.id;
+      if (bookId) {
+        this.reloadBook(bookId);
+      }
+    });
+  }
+
+  private reloadBook(bookId: number): void {
+    this.bookService.find(bookId).subscribe({
+      next: res => {
+        if (res.body) {
+          this.displayBook.set(res.body);
+        }
+      },
+      error: err => console.error('Error reloading book', err),
+    });
   }
 
   private loadReviews(bookId: number): void {

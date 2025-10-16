@@ -130,8 +130,9 @@
                   <div>{{ book.category.name }}</div>
                 }
               </td>
+
               <td>
-                <ng-container *ngIf="book.averageRating !== null && book.averageRating !== undefined; else noRating">
+                <ng-container *ngIf="averageRating(book) > 0; else noRating">
                   <span style="min-width: 120px; display: inline-block">
                     <ng-container *ngFor="let star of getStars(book)">
                       <fa-icon [icon]="star <= averageRating(book) ? faStar : farStar" class="text-warning"></fa-icon>
@@ -142,7 +143,6 @@
                   <span class="text-muted">–</span>
                 </ng-template>
               </td>
-
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/book', book.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
