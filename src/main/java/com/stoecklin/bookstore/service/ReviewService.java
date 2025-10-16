@@ -42,23 +42,14 @@ public class ReviewService {
 
         // recalculate average rating for the associated book
         if (review.getBook() != null && review.getBook().getId() != null) {
-            Book book = bookRepository.findById(review.getBook().getId()).orElse(null);
-            if (book != null) {
-                review.setBook(book); // ensures the book reference is managed
-                reviewRepository.save(review);
-                updateBookAverageRating(book.getId());
-            }
+            updateBookAverageRating(review.getBook().getId());
         }
 
         return result;
     }
 
     private void updateBookAverageRating(Long bookId) {
-        List<Review> reviews = reviewRepository
-            .findAll()
-            .stream()
-            .filter(r -> r.getBook() != null && r.getBook().getId().equals(bookId))
-            .toList();
+        List<Review> reviews = reviewRepository.findByBook_Id(bookId);
 
         if (!reviews.isEmpty()) {
             DoubleSummaryStatistics stats = reviews.stream().mapToDouble(Review::getRating).summaryStatistics();
@@ -70,6 +61,14 @@ public class ReviewService {
                 book.setAverageRating(average);
                 bookRepository.save(book);
                 log.debug("Updated average rating for book {} to {}", bookId, average);
+            }
+        } else {
+            // If no reviews, set average rating to null or 0
+            Book book = bookRepository.findById(bookId).orElse(null);
+            if (book != null) {
+                book.setAverageRating(null);
+                bookRepository.save(book);
+                log.debug("Cleared average rating for book {} (no reviews)", bookId);
             }
         }
     }

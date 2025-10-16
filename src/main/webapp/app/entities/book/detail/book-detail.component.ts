@@ -51,8 +51,10 @@ export class BookDetailComponent {
       const bookRef = this.book();
       if (bookRef?.id) {
         this.displayBook.set({ ...bookRef });
+        this.loadReviews(bookRef.id);
       } else {
         this.displayBook.set(null);
+        this.reviews.set([]);
       }
     });
   }
