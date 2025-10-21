@@ -105,11 +105,25 @@ public class BookResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        book = bookRepository.save(book);
-        bookSearchRepository.index(book);
+        // Fetch the existing book to preserve reviews
+        Book existingBook = bookRepository
+            .findById(id)
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+
+        // Update only the fields that should be modified, preserve reviews
+        existingBook.setTitle(book.getTitle());
+        existingBook.setAuthor(book.getAuthor());
+        existingBook.setDescription(book.getDescription());
+        existingBook.setPrice(book.getPrice());
+        existingBook.setStock(book.getStock());
+        existingBook.setCategory(book.getCategory());
+        // Don't touch reviews - they are managed separately
+
+        existingBook = bookRepository.save(existingBook);
+        bookSearchRepository.index(existingBook);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, book.getId().toString()))
-            .body(book);
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, existingBook.getId().toString()))
+            .body(existingBook);
     }
 
     /**
