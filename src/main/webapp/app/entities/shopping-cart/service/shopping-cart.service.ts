@@ -114,6 +114,10 @@ export class ShoppingCartService {
     return shoppingCartCollection;
   }
 
+  placeOrder(): Observable<HttpResponse<any>> {
+    return this.http.post<any>(`${this.applicationConfigService.getEndpointFor('api/orders')}/place-order`, null, { observe: 'response' });
+  }
+
   protected convertDateFromClient<T extends IShoppingCart | NewShoppingCart | PartialUpdateShoppingCart>(shoppingCart: T): RestOf<T> {
     return {
       ...shoppingCart,

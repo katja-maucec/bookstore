@@ -62,9 +62,9 @@
               <fa-icon icon="arrow-left"></fa-icon>
               <span class="ms-2">Continue Shopping</span>
             </button>
-            <button class="btn btn-success btn-lg">
-              <fa-icon icon="credit-card"></fa-icon>
-              <span class="ms-2">Proceed to Checkout</span>
+            <button class="btn btn-success btn-lg" (click)="placeOrder()" [disabled]="isLoading">
+              <fa-icon icon="receipt"></fa-icon>
+              <span class="ms-2">Place Order</span>
             </button>
           </div>
         }

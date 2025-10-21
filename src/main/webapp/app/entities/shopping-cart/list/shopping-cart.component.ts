@@ -64,4 +64,25 @@ export class ShoppingCartComponent implements OnInit {
   continueShopping(): void {
     this.router.navigate(['/book']);
   }
+
+  placeOrder(): void {
+    if (!this.cart()?.items || this.cart()!.items!.length === 0) {
+      return;
+    }
+
+    this.isLoading = true;
+    this.shoppingCartService.placeOrder().subscribe({
+      next: () => {
+        this.isLoading = false;
+        // Navigate to orders page
+        this.router.navigate(['/order']);
+      },
+      error: err => {
+        console.error('Error placing order:', err);
+        this.isLoading = false;
+        // You might want to show an error message here
+        alert('Failed to place order. Please try again.');
+      },
+    });
+  }
 }
