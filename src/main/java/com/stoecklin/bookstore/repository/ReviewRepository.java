@@ -32,6 +32,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     List<Review> findByBook_Id(Long bookId);
 
+    @Query("select review from Review review left join fetch review.user where review.book.id = :bookId")
+    List<Review> findByBook_IdWithUser(@Param("bookId") Long bookId);
+
     @Query(value = "select review from Review review left join fetch review.user", countQuery = "select count(review) from Review review")
     Page<Review> findAllWithToOneRelationships(Pageable pageable);
 

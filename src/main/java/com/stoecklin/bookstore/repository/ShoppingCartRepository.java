@@ -49,4 +49,9 @@ public interface ShoppingCartRepository extends JpaRepository<ShoppingCart, Long
         ":userId AND sc.completed = :completed"
     )
     Optional<ShoppingCart> findByUserAndCompletedWithItems(@Param("userId") Long userId, @Param("completed") Boolean completed);
+
+    @Query(
+        "select c from ShoppingCart c left join fetch c.items i left join fetch i.book where c.user = :user and c" + ".completed = false"
+    )
+    Optional<ShoppingCart> findOneWithEagerRelationshipsByUserAndCompletedFalse(@Param("user") User user);
 }

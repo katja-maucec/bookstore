@@ -2,9 +2,12 @@ package com.stoecklin.bookstore.service;
 
 import com.stoecklin.bookstore.domain.Book;
 import com.stoecklin.bookstore.domain.Review;
+import com.stoecklin.bookstore.domain.User;
 import com.stoecklin.bookstore.repository.BookRepository;
 import com.stoecklin.bookstore.repository.ReviewRepository;
+import com.stoecklin.bookstore.repository.UserRepository;
 import com.stoecklin.bookstore.repository.search.ReviewSearchRepository;
+import com.stoecklin.bookstore.security.SecurityUtils;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.DoubleSummaryStatistics;
@@ -22,11 +25,18 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final BookRepository bookRepository;
     private final ReviewSearchRepository reviewSearchRepository;
+    private final UserRepository userRepository;
 
-    public ReviewService(ReviewRepository reviewRepository, BookRepository bookRepository, ReviewSearchRepository reviewSearchRepository) {
+    public ReviewService(
+        ReviewRepository reviewRepository,
+        BookRepository bookRepository,
+        ReviewSearchRepository reviewSearchRepository,
+        UserRepository userRepository
+    ) {
         this.reviewRepository = reviewRepository;
         this.bookRepository = bookRepository;
         this.reviewSearchRepository = reviewSearchRepository;
+        this.userRepository = userRepository;
     }
 
     public Review save(Review review) {
@@ -35,6 +45,13 @@ public class ReviewService {
         // ensure timestamp
         if (review.getCreatedAt() == null) {
             review.setCreatedAt(Instant.now());
+        }
+
+        // assign current user
+        if (review.getUser() == null) {
+            String login = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new IllegalStateException("User not logged in"));
+            User user = userRepository.findOneByLogin(login).orElseThrow(() -> new IllegalStateException("User not found: " + login));
+            review.setUser(user);
         }
 
         Review result = reviewRepository.save(review);
@@ -80,6 +97,6 @@ public class ReviewService {
 
     public List<Review> findByBook(Long bookId) {
         log.debug("Request to get all Reviews for Book ID : {}", bookId);
-        return reviewRepository.findByBook_Id(bookId);
+        return reviewRepository.findByBook_IdWithUser(bookId);
     }
 }

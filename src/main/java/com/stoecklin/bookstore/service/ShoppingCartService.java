@@ -51,7 +51,7 @@ public class ShoppingCartService {
         User user = userRepository.findOneByLogin(login).orElseThrow(() -> new IllegalStateException("User not found: " + login));
 
         return cartRepository
-            .findOneByUserAndCompletedIsFalse(user)
+            .findOneWithEagerRelationshipsByUserAndCompletedFalse(user)
             .orElseGet(() -> {
                 ShoppingCart c = new ShoppingCart();
                 c.setCreatedAt(Instant.now());
@@ -61,12 +61,11 @@ public class ShoppingCartService {
             });
     }
 
-    public CartItem addItem(Long cartId, Long bookId, Integer quantity) {
-        ShoppingCart cart = cartRepository.findById(cartId).orElseThrow(() -> new IllegalStateException("ShoppingCart not found"));
+    public CartItem addItem(Long bookId, Integer quantity) {
+        ShoppingCart cart = getOrCreateCurrentUserCart();
 
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new IllegalStateException("Book not found"));
 
-        // Update existing cart item or create new
         CartItem item = cartItemRepository
             .findByCartAndBook(cart, book)
             .map(existing -> {

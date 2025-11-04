@@ -99,9 +99,9 @@ public class ShoppingCartResource {
      */
     @PostMapping("/add-book")
     public ResponseEntity<CartItem> addBookToCart(@RequestParam Long bookId, @RequestParam(defaultValue = "1") Integer quantity) {
-        LOG.debug("REST request to add book {} to cart", bookId);
-        CartItem cartItem = shoppingCartService.addItem(shoppingCartService.getOrCreateCurrentUserCart().getId(), bookId, quantity);
-        return ResponseEntity.ok().body(cartItem);
+        LOG.debug("REST request to add book {} to current user's cart", bookId);
+        CartItem cartItem = shoppingCartService.addItem(bookId, quantity);
+        return ResponseEntity.ok(cartItem);
     }
 
     /**

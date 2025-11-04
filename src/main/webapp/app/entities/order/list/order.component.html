@@ -71,13 +71,6 @@
                 }
               </div>
             </th>
-            <th scope="col" jhiSortBy="user.login">
-              <div class="d-flex">
-                <span>User</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
@@ -94,9 +87,6 @@
                     order.status ?? 'null'
                   ]
                 }}
-              </td>
-              <td>
-                {{ order.user?.login }}
               </td>
               <td class="text-end">
                 <div class="btn-group">
