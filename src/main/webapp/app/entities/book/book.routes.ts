@@ -11,7 +11,7 @@ const bookRoute: Routes = [
     data: {
       defaultSort: `id,${ASC}`,
     },
-    canActivate: [UserRouteAccessService],
+    // canActivate: [UserRouteAccessService],
   },
   {
     path: ':id/view',
@@ -19,7 +19,7 @@ const bookRoute: Routes = [
     resolve: {
       book: BookResolve,
     },
-    canActivate: [UserRouteAccessService],
+    // canActivate: [UserRouteAccessService],
   },
   {
     path: 'new',

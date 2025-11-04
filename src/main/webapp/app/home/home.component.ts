@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import SharedModule from 'app/shared/shared.module';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
+import { Authority } from '../config/authority.constants';
 
 @Component({
   selector: 'jhi-home',
@@ -17,6 +18,10 @@ import { Account } from 'app/core/auth/account.model';
 export default class HomeComponent implements OnInit, OnDestroy {
   account = signal<Account | null>(null);
   searchQuery = '';
+
+  isAdmin(): boolean {
+    return this.account()?.authorities?.includes(Authority.ADMIN) ?? false;
+  }
 
   private readonly destroy$ = new Subject<void>();
 

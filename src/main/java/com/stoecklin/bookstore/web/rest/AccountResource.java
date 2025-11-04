@@ -7,16 +7,24 @@ import com.stoecklin.bookstore.service.MailService;
 import com.stoecklin.bookstore.service.UserService;
 import com.stoecklin.bookstore.service.dto.AdminUserDTO;
 import com.stoecklin.bookstore.service.dto.PasswordChangeDTO;
-import com.stoecklin.bookstore.web.rest.errors.*;
+import com.stoecklin.bookstore.web.rest.errors.EmailAlreadyUsedException;
+import com.stoecklin.bookstore.web.rest.errors.InvalidPasswordException;
+import com.stoecklin.bookstore.web.rest.errors.LoginAlreadyUsedException;
 import com.stoecklin.bookstore.web.rest.vm.KeyAndPasswordVM;
 import com.stoecklin.bookstore.web.rest.vm.ManagedUserVM;
 import jakarta.validation.Valid;
-import java.util.*;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST controller for managing the current user's account.
@@ -61,21 +69,22 @@ public class AccountResource {
             throw new InvalidPasswordException();
         }
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
-        mailService.sendActivationEmail(user);
+        // No activation email needed - user is immediately activated
+        // mailService.sendActivationEmail(user);
     }
 
     /**
-     * {@code GET  /activate} : activate the registered user.
+     * {@code GET  /activate} : activate the registered user. Note: This endpoint is no longer needed as users are
+     * activated immediately upon registration.
      *
      * @param key the activation key.
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be activated.
      */
     @GetMapping("/activate")
     public void activateAccount(@RequestParam(value = "key") String key) {
-        Optional<User> user = userService.activateRegistration(key);
-        if (!user.isPresent()) {
-            throw new AccountResourceException("No user was found for this activation key");
-        }
+        // Users are now activated immediately upon registration
+        // This endpoint is kept for backwards compatibility but does nothing
+        LOG.debug("Activation endpoint called but users are now auto-activated");
     }
 
     /**

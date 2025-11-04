@@ -34,7 +34,7 @@ export default class RegisterComponent implements AfterViewInit {
     }),
     email: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(5), Validators.maxLength(254), Validators.email],
+      validators: [Validators.maxLength(254), Validators.email],
     }),
     password: new FormControl('', {
       nonNullable: true,

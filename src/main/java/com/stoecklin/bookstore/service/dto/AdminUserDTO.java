@@ -3,7 +3,10 @@ package com.stoecklin.bookstore.service.dto;
 import com.stoecklin.bookstore.config.Constants;
 import com.stoecklin.bookstore.domain.Authority;
 import com.stoecklin.bookstore.domain.User;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Set;
@@ -30,7 +33,7 @@ public class AdminUserDTO implements Serializable {
     private String lastName;
 
     @Email
-    @Size(min = 5, max = 254)
+    @Size(max = 254)
     private String email;
 
     @Size(max = 256)
@@ -179,18 +182,18 @@ public class AdminUserDTO implements Serializable {
     @Override
     public String toString() {
         return "AdminUserDTO{" +
-            "login='" + login + '\'' +
-            ", firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
-            ", email='" + email + '\'' +
-            ", imageUrl='" + imageUrl + '\'' +
-            ", activated=" + activated +
-            ", langKey='" + langKey + '\'' +
-            ", createdBy=" + createdBy +
-            ", createdDate=" + createdDate +
-            ", lastModifiedBy='" + lastModifiedBy + '\'' +
-            ", lastModifiedDate=" + lastModifiedDate +
-            ", authorities=" + authorities +
-            "}";
+               "login='" + login + '\'' +
+               ", firstName='" + firstName + '\'' +
+               ", lastName='" + lastName + '\'' +
+               ", email='" + email + '\'' +
+               ", imageUrl='" + imageUrl + '\'' +
+               ", activated=" + activated +
+               ", langKey='" + langKey + '\'' +
+               ", createdBy=" + createdBy +
+               ", createdDate=" + createdDate +
+               ", lastModifiedBy='" + lastModifiedBy + '\'' +
+               ", lastModifiedDate=" + lastModifiedDate +
+               ", authorities=" + authorities +
+               "}";
     }
 }

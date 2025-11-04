@@ -18,6 +18,7 @@ import { Authority } from 'app/config/authority.constants';
 import { IReview } from '../../review/review.model';
 import { RefreshService } from '../../../shared/refresh.service';
 import { ShoppingCartService } from '../../shopping-cart/service/shopping-cart.service';
+import { Account } from '../../../core/auth/account.model';
 
 type BookWithAverage = IBook & {
   reviews: IReview[]; // always an array
@@ -34,6 +35,8 @@ export class BookComponent implements OnInit {
 
   subscription: Subscription | null = null;
   books = signal<BookWithAverage[]>([]);
+
+  account = signal<Account | null>(null);
 
   isLoading = false;
 

@@ -1,23 +1,6 @@
 <div>
   <h2 id="page-heading" data-cy="OrderHeading">
-    <span>Orders</span>
-
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
-        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
-        <span>Refresh list</span>
-      </button>
-
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-order"
-        [routerLink]="['/order/new']"
-      >
-        <fa-icon icon="plus"></fa-icon>
-        <span class="hidden-sm-down">Create a new Order</span>
-      </button>
-    </div>
+    <span>My Orders</span>
   </h2>
 
   <jhi-alert-error />

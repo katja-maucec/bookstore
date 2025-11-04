@@ -4,7 +4,7 @@
       <h1 data-cy="registerTitle">Registration</h1>
 
       @if (success()) {
-        <div class="alert alert-success"><strong>Registration saved!</strong> Please check your email for confirmation.</div>
+        <div class="alert alert-success"><strong>Registration saved!</strong> You can now sign in with your account.</div>
       }
 
       @if (error()) {
@@ -63,39 +63,39 @@
             }
           </div>
 
-          <div class="mb-3">
-            <label class="form-label" for="email">Email</label>
-            <input
-              type="email"
-              class="form-control"
-              id="email"
-              name="email"
-              placeholder="Your email"
-              formControlName="email"
-              data-cy="email"
-            />
+          <!--          <div class="mb-3">-->
+          <!--            <label class="form-label" for="email">Email</label>-->
+          <!--            <input-->
+          <!--              type="email"-->
+          <!--              class="form-control"-->
+          <!--              id="email"-->
+          <!--              name="email"-->
+          <!--              placeholder="Your email"-->
+          <!--              formControlName="email"-->
+          <!--              data-cy="email"-->
+          <!--            />-->
 
-            @let emailRef = registerForm.get('email')!;
-            @if (emailRef.invalid && (emailRef.dirty || emailRef.touched)) {
-              <div>
-                @if (emailRef?.errors?.required) {
-                  <small class="form-text text-danger">Your email is required.</small>
-                }
+          <!--            @let emailRef = registerForm.get('email')!;-->
+          <!--            @if (emailRef.invalid && (emailRef.dirty || emailRef.touched)) {-->
+          <!--              <div>-->
+          <!--                @if (emailRef?.errors?.required) {-->
+          <!--                  <small class="form-text text-danger">Your email is required.</small>-->
+          <!--                }-->
 
-                @if (emailRef?.errors?.invalid) {
-                  <small class="form-text text-danger">Your email is invalid.</small>
-                }
+          <!--                @if (emailRef?.errors?.invalid) {-->
+          <!--                  <small class="form-text text-danger">Your email is invalid.</small>-->
+          <!--                }-->
 
-                @if (emailRef?.errors?.minlength) {
-                  <small class="form-text text-danger">Your email is required to be at least 5 characters.</small>
-                }
+          <!--                @if (emailRef?.errors?.minlength) {-->
+          <!--                  <small class="form-text text-danger">Your email is required to be at least 5 characters.</small>-->
+          <!--                }-->
 
-                @if (emailRef?.errors?.maxlength) {
-                  <small class="form-text text-danger">Your email cannot be longer than 50 characters.</small>
-                }
-              </div>
-            }
-          </div>
+          <!--                @if (emailRef?.errors?.maxlength) {-->
+          <!--                  <small class="form-text text-danger">Your email cannot be longer than 50 characters.</small>-->
+          <!--                }-->
+          <!--              </div>-->
+          <!--            }-->
+          <!--          </div>-->
 
           <div class="mb-3">
             <label class="form-label" for="password">New password</label>

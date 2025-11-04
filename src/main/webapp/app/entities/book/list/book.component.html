@@ -30,7 +30,7 @@
           [(ngModel)]="currentSearch"
           id="currentSearch"
           name="currentSearch"
-          placeholder="Search for Book"
+          placeholder="Search for books by title, author, or description"
         />
 
         <button class="btn btn-info" (click)="search(currentSearch)">
@@ -161,7 +161,7 @@
                   </button>
 
                   <a
-                    *ngIf="!isAdmin()"
+                    *ngIf="!isAdmin() && account()"
                     [routerLink]="['/book', book.id, 'review']"
                     class="btn btn-success btn-sm"
                     data-cy="entityLeaveReviewButton"
@@ -170,7 +170,7 @@
                     <span class="d-none d-md-inline">Review</span>
                   </a>
                   <button
-                    *ngIf="!isAdmin()"
+                    *ngIf="!isAdmin() && account()"
                     type="button"
                     (click)="addToCart(book)"
                     [disabled]="!canAddToCart(book)"
