@@ -5,7 +5,6 @@ import com.stoecklin.bookstore.domain.ShoppingCart;
 import com.stoecklin.bookstore.repository.ShoppingCartRepository;
 import com.stoecklin.bookstore.repository.UserRepository;
 import com.stoecklin.bookstore.repository.search.ShoppingCartSearchRepository;
-import com.stoecklin.bookstore.security.SecurityUtils;
 import com.stoecklin.bookstore.service.ShoppingCartService;
 import com.stoecklin.bookstore.web.rest.errors.BadRequestAlertException;
 import com.stoecklin.bookstore.web.rest.errors.ElasticsearchExceptionMapper;
@@ -113,13 +112,12 @@ public class ShoppingCartResource {
     @GetMapping("/my-cart")
     public ResponseEntity<ShoppingCart> getMyCart() {
         LOG.debug("REST request to get current user's cart");
-        String login = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new IllegalStateException("User not logged in"));
-
-        Optional<ShoppingCart> cart = userRepository
-            .findOneByLogin(login)
-            .flatMap(user -> shoppingCartRepository.findByUserAndCompletedWithItems(user.getId(), false));
-
-        return ResponseUtil.wrapOrNotFound(cart);
+        try {
+            ShoppingCart cart = shoppingCartService.getOrCreateCurrentUserCart();
+            return ResponseEntity.ok(cart);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(500).build();
+        }
     }
 
     /**
