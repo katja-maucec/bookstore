@@ -11,6 +11,8 @@ import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigati
 import { IOrder } from '../order.model';
 import { EntityArrayResponseType, OrderService } from '../service/order.service';
 import { OrderDeleteDialogComponent } from '../delete/order-delete-dialog.component';
+import { AccountService } from 'app/core/auth/account.service';
+import { Account } from 'app/core/auth/account.model';
 
 @Component({
   selector: 'jhi-order',
@@ -27,7 +29,10 @@ export class OrderComponent implements OnInit {
   sortState = sortStateSignal({});
   currentSearch = '';
 
+  account = signal<Account | null>(null);
+
   public readonly router = inject(Router);
+  protected readonly accountService = inject(AccountService);
   protected readonly orderService = inject(OrderService);
   protected readonly activatedRoute = inject(ActivatedRoute);
   protected readonly sortService = inject(SortService);
@@ -37,12 +42,19 @@ export class OrderComponent implements OnInit {
   trackId = (item: IOrder): number => this.orderService.getOrderIdentifier(item);
 
   ngOnInit(): void {
-    this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
-      .pipe(
-        tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
-        tap(() => this.load()),
-      )
-      .subscribe();
+    this.accountService.identity().subscribe(account => {
+      this.account.set(account);
+
+      // only load if the user is logged in
+      if (account) {
+        this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
+          .pipe(
+            tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
+            tap(() => this.load()),
+          )
+          .subscribe();
+      }
+    });
   }
 
   search(query: string): void {
@@ -96,7 +108,12 @@ export class OrderComponent implements OnInit {
 
   protected onResponseSuccess(response: EntityArrayResponseType): void {
     const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
-    this.orders.set(this.refineData(dataFromBody));
+
+    // ✅ Filter orders by logged-in user
+    const account = this.account();
+    const filteredOrders = account ? dataFromBody.filter(order => order.user?.login === account.login) : [];
+
+    this.orders.set(this.refineData(filteredOrders));
   }
 
   protected refineData(data: IOrder[]): IOrder[] {
@@ -110,13 +127,14 @@ export class OrderComponent implements OnInit {
 
   protected queryBackend(): Observable<EntityArrayResponseType> {
     const { currentSearch } = this;
-
     this.isLoading = true;
+
     const queryObject: any = {
       eagerload: true,
       query: currentSearch,
       sort: this.sortService.buildSortParam(this.sortState()),
     };
+
     if (this.currentSearch && this.currentSearch !== '') {
       return this.orderService.search(queryObject).pipe(tap(() => (this.isLoading = false)));
     }
