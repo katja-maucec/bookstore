@@ -86,7 +86,7 @@
               <td>
                 <a [routerLink]="['/order', order.id, 'view']">{{ order.id }}</a>
               </td>
-              <td>{{ order.totalPrice }}</td>
+              <td>${{ order.totalPrice }}</td>
               <td>{{ order.placedAt | formatMediumDatetime }}</td>
               <td>
                 {{

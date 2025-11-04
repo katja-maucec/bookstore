@@ -62,14 +62,17 @@ export class BookComponent implements OnInit {
 
   ngOnInit(): void {
     this.accountService.identity().subscribe(account => {
+      this.account.set(account); // <-- add this line
       this.isAdmin.set(account?.authorities.includes(Authority.ADMIN) ?? false);
     });
+
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
       .pipe(
         tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
         tap(() => this.load()),
       )
       .subscribe();
+
     this.refreshService.onRefresh().subscribe(() => {
       this.load();
     });
