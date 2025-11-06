@@ -84,11 +84,8 @@ public class OrderService {
         BigDecimal totalPrice = BigDecimal.ZERO;
         Set<OrderItem> orderItems = new HashSet<>();
 
-        // Keep track of cart items to delete
-        Set<CartItem> cartItemsToDelete = new HashSet<>(cart.getItems());
-
         // Convert cart items to order items and update stock
-        for (CartItem cartItem : cartItemsToDelete) {
+        for (CartItem cartItem : cart.getItems()) {
             Book book = cartItem.getBook();
 
             // Check stock availability
@@ -121,16 +118,16 @@ public class OrderService {
         order = orderRepository.save(order);
         orderSearchRepository.index(order);
 
-        // Delete cart items explicitly
-        for (CartItem cartItem : cartItemsToDelete) {
-            cart.removeItems(cartItem);
+        // mark cart completed
+        cart.setCompleted(true);
+        shoppingCartRepository.save(cart);
+
+        // optionally, clear old cart items
+        for (CartItem cartItem : cart.getItems()) {
             cartItemRepository.delete(cartItem);
         }
 
-        // Save the cart after clearing items
-        shoppingCartRepository.save(cart);
-
         LOG.debug("Order placed successfully with ID: {}", order.getId());
-        return order;
+        return orderRepository.findByIdWithItemsAndBooks(order.getId()).orElse(order);
     }
 }

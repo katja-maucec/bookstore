@@ -176,7 +176,7 @@ public class OrderResource {
     public List<Order> getAllOrders(@RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload) {
         LOG.debug("REST request to get all Orders");
         if (eagerload) {
-            return orderRepository.findAllWithEagerRelationships();
+            return orderRepository.findAllWithItemsAndBooks();
         } else {
             return orderRepository.findAll();
         }
@@ -192,7 +192,7 @@ public class OrderResource {
     @GetMapping("/{id}")
     public ResponseEntity<Order> getOrder(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Order : {}", id);
-        Optional<Order> order = orderRepository.findOneWithEagerRelationships(id);
+        Optional<Order> order = orderRepository.findByIdWithItemsAndBooks(id);
         return ResponseUtil.wrapOrNotFound(order);
     }
 

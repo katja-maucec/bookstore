@@ -1,6 +1,7 @@
 package com.stoecklin.bookstore.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,6 +28,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "book")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @org.springframework.data.elasticsearch.annotations.Document(indexName = "book")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Book implements Serializable {

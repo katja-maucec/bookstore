@@ -17,32 +17,48 @@
           </dd>
           <dt><span>Total Price</span></dt>
           <dd>
-            <span>{{ orderRef.totalPrice }}</span>
+            <span>${{ orderRef.totalPrice }}</span>
           </dd>
           <dt><span>Placed At</span></dt>
           <dd>
             <span>{{ orderRef.placedAt | formatMediumDatetime }}</span>
           </dd>
-          <dt><span>Status</span></dt>
+          <dt><span>Books Ordered</span></dt>
           <dd>
-            <span>{{
-              { null: '', PENDING: 'PENDING', PAID: 'PAID', SHIPPED: 'SHIPPED', CANCELLED: 'CANCELLED', COMPLETED: 'COMPLETED' }[
-                orderRef.status ?? 'null'
-              ]
-            }}</span>
-          </dd>
-          <dt><span>User</span></dt>
-          <dd>
-            <span>{{ orderRef.user?.login }}</span>
+            <table class="table table-striped" *ngIf="orderRef.items?.length; else noBooks">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of orderRef.items">
+                  <td>
+                    <ng-container *ngIf="item.book">
+                      <a [routerLink]="['/book', item.book.id, 'view']">{{ item.book.title }}</a>
+                    </ng-container>
+                    <ng-container *ngIf="!item.book">
+                      <span>No book details</span>
+                    </ng-container>
+                  </td>
+                  <td>{{ item.quantity }}</td>
+                  <td>{{ item.price | currency }}</td>
+                  <td>{{ (item.price ?? 0) * (item.quantity ?? 0) | currency }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <ng-template #noBooks>
+              <p>No books in this order.</p>
+            </ng-template>
           </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
           <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
-        </button>
-
-        <button type="button" [routerLink]="['/order', orderRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
         </button>
       </div>
     }

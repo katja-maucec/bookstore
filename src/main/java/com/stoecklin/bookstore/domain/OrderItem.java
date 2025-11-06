@@ -1,8 +1,17 @@
 package com.stoecklin.bookstore.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import org.hibernate.annotations.Cache;
@@ -35,12 +44,13 @@ public class OrderItem implements Serializable {
     @Column(name = "price", precision = 21, scale = 2, nullable = false)
     private BigDecimal price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "reviews", "category" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnoreProperties(value = { "reviews", "category", "orderItems" })
     private Book book;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "items", "user" }, allowSetters = true)
+    @JoinColumn(name = "order_id")
     private Order order;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -133,9 +143,9 @@ public class OrderItem implements Serializable {
     @Override
     public String toString() {
         return "OrderItem{" +
-            "id=" + getId() +
-            ", quantity=" + getQuantity() +
-            ", price=" + getPrice() +
-            "}";
+               "id=" + getId() +
+               ", quantity=" + getQuantity() +
+               ", price=" + getPrice() +
+               "}";
     }
 }

@@ -2,8 +2,20 @@ package com.stoecklin.bookstore.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.stoecklin.bookstore.domain.enumeration.OrderStatus;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -44,10 +56,9 @@ public class Order implements Serializable {
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Keyword)
     private OrderStatus status;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @org.springframework.data.annotation.Transient
-    @JsonIgnoreProperties(value = { "book", "order" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "order" }, allowSetters = true)
     private Set<OrderItem> items = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -174,10 +185,10 @@ public class Order implements Serializable {
     @Override
     public String toString() {
         return "Order{" +
-            "id=" + getId() +
-            ", totalPrice=" + getTotalPrice() +
-            ", placedAt='" + getPlacedAt() + "'" +
-            ", status='" + getStatus() + "'" +
-            "}";
+               "id=" + getId() +
+               ", totalPrice=" + getTotalPrice() +
+               ", placedAt='" + getPlacedAt() + "'" +
+               ", status='" + getStatus() + "'" +
+               "}";
     }
 }
