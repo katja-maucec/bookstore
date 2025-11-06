@@ -57,6 +57,7 @@ public class ShoppingCartService {
                 c.setCreatedAt(Instant.now());
                 c.setCompleted(false);
                 c.setUser(user);
+                c.setItems(new java.util.HashSet<>());
                 return cartRepository.save(c);
             });
     }
