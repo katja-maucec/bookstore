@@ -15,6 +15,7 @@ import com.stoecklin.bookstore.repository.ShoppingCartRepository;
 import com.stoecklin.bookstore.repository.UserRepository;
 import com.stoecklin.bookstore.security.SecurityUtils;
 import java.time.Instant;
+import java.util.HashSet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -116,5 +117,13 @@ public class ShoppingCartService {
         // mark cart completed/archived (add a boolean field 'completed' to ShoppingCart if you like)
         cart.setCompleted(true);
         cartRepository.save(cart);
+
+        // Automatically create a new empty cart
+        ShoppingCart newCart = new ShoppingCart();
+        newCart.setUser(cart.getUser());
+        newCart.setCreatedAt(Instant.now());
+        newCart.setCompleted(false);
+        newCart.setItems(new HashSet<>());
+        cartRepository.save(newCart);
     }
 }
