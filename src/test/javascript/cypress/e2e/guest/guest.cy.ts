@@ -33,20 +33,23 @@ describe('Guest user e2e test', () => {
   describe('Navigation', () => {
     it('should navigate to bookstore when clicking "Browse all books"', () => {
       // Wait for Angular and the page to render
-      cy.get('body', { timeout: 10000 }).should('exist');
+      cy.get('body').should('exist');
 
       // Wait until the button exists and is visible
-      cy.get('[data-cy="browse-all-books-button"]', { timeout: 10000 }).should('exist').should('be.visible').click();
+      cy.get('[data-cy="browse-all-books-button"]').should('exist').should('be.visible').click();
 
       // Ensure we navigated to bookstore
-      cy.url({ timeout: 10000 }).should('include', '/book');
+      cy.url().should('include', '/book');
     });
 
     it('should navigate to Sign In page', () => {
       // Wait for navbar to be rendered
       cy.get('[data-cy="navbar"]', { timeout: 10000 }).should('exist');
 
-      // Click the login link
+      // Click the account menu to open dropdown
+      cy.get('[data-cy="accountMenu"]', { timeout: 10000 }).should('exist').should('be.visible').click();
+
+      // Click the "Sign in" item in the dropdown
       cy.get('[data-cy="login"]', { timeout: 10000 }).should('exist').should('be.visible').click();
 
       // Verify URL and page content
@@ -57,6 +60,9 @@ describe('Guest user e2e test', () => {
     it('should navigate to Register page', () => {
       // Wait for navbar to be rendered
       cy.get('[data-cy="navbar"]', { timeout: 10000 }).should('exist');
+
+      // Click the account menu to open dropdown
+      cy.get('[data-cy="accountMenu"]', { timeout: 10000 }).should('exist').should('be.visible').click();
 
       // Click the register link
       cy.get('[data-cy="register"]', { timeout: 10000 }).should('exist').should('be.visible').click();
@@ -73,13 +79,21 @@ describe('Guest user e2e test', () => {
   describe('Book details page', () => {
     beforeEach(() => {
       cy.visit(bookstoreUrl);
-      cy.get('a').contains('View details').first().click(); // Adjust selector to match your button/link
+
+      // Wait until the books table is rendered
+      cy.get('[data-cy="entityTable"]').should('exist');
+
+      // Click the first "View" button (view details)
+      cy.get('[data-cy="entityDetailsButton"]').first().click();
     });
 
     it('should show book information but no review or add-to-cart buttons', () => {
-      cy.get('h1, h2, h3').should('exist'); // some title
-      cy.contains('Add to cart').should('not.exist');
-      cy.contains('Write a review').should('not.exist');
+      // Check that the book title is shown (h1/h2/h3 is fine)
+      cy.get('h1, h2, h3').should('exist');
+
+      // Ensure guest cannot see review or add-to-cart
+      cy.get('[data-cy="entityLeaveReviewButton"]').should('not.exist');
+      cy.get('[data-cy="entityAddToCartButton"]').should('not.exist');
     });
   });
 
@@ -106,7 +120,6 @@ describe('Guest user e2e test', () => {
       const randomUser = `test_${Date.now()}`;
 
       cy.get('input[name="login"]').type(randomUser);
-      cy.get('input[name="email"]').type(`${randomUser}@example.com`);
       cy.get('input[name="password"]').type('Test1234!');
       cy.get('input[name="confirmPassword"]').type('Test1234!');
 
