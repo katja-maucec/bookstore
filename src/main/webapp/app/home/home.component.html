@@ -1,6 +1,5 @@
 <div class="row mt-8" style="margin-top: 10rem">
   <div class="col-md-10 col-lg-8 text-center mx-auto">
-    <!--    @if (account() !== null) {-->
     <h1 class="display-4"><span>Welcome to the Bookstore!</span></h1>
     <h3 class="mt-3"><span>Search through our catalogue:</span></h3>
 
@@ -23,13 +22,12 @@
         </div>
       </form>
       <div class="mt-5">
-        <a routerLink="/book" class="btn btn-info">
+        <a routerLink="/book" class="btn btn-info" data-cy="browse-all-books-button">
           <fa-icon icon="book"></fa-icon>
           <span class="ms-1">Browse All Books</span>
         </a>
       </div>
     </div>
-    <!--    }-->
 
     <div class="mt-4">
       @if (account() === null) {

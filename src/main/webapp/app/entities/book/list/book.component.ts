@@ -61,9 +61,9 @@ export class BookComponent implements OnInit {
   trackId = (book: Pick<IBook, 'id'>): number => this.bookService.getBookIdentifier(book);
 
   ngOnInit(): void {
-    this.accountService.identity().subscribe(account => {
-      this.account.set(account); // <-- add this line
-      this.isAdmin.set(account?.authorities.includes(Authority.ADMIN) ?? false);
+    this.accountService.getAuthenticationState().subscribe(account => {
+      this.account.set(account);
+      this.isAdmin.set(account?.authorities?.includes(Authority.ADMIN) ?? false);
     });
 
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
@@ -72,10 +72,6 @@ export class BookComponent implements OnInit {
         tap(() => this.load()),
       )
       .subscribe();
-
-    this.refreshService.onRefresh().subscribe(() => {
-      this.load();
-    });
   }
 
   search(query: string): void {

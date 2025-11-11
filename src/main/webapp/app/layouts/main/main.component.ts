@@ -18,7 +18,18 @@ export default class MainComponent implements OnInit {
   private readonly accountService = inject(AccountService);
 
   ngOnInit(): void {
-    // try to log in automatically
-    this.accountService.identity().subscribe();
+    this.accountService.identity().subscribe({
+      next: () => {
+        // logged in, nothing else needed
+      },
+      error: err => {
+        if (err.status === 401) {
+          // guest user, ignore
+          console.log('Guest user detected, skipping automatic login.');
+        } else {
+          console.error('Unexpected error fetching account:', err);
+        }
+      },
+    });
   }
 }

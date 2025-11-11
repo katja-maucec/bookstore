@@ -19,12 +19,7 @@ export default class HomeComponent implements OnInit, OnDestroy {
   account = signal<Account | null>(null);
   searchQuery = '';
 
-  isAdmin(): boolean {
-    return this.account()?.authorities?.includes(Authority.ADMIN) ?? false;
-  }
-
   private readonly destroy$ = new Subject<void>();
-
   private readonly accountService = inject(AccountService);
   private readonly router = inject(Router);
 
@@ -32,7 +27,10 @@ export default class HomeComponent implements OnInit, OnDestroy {
     this.accountService
       .getAuthenticationState()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(account => this.account.set(account));
+      .subscribe({
+        next: account => this.account.set(account),
+        error: () => this.account.set(null), // guest users
+      });
   }
 
   login(): void {
